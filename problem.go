@@ -45,6 +45,7 @@ func NewProblemList(level, valid, size int) ProblemList {
 		}
 		pl[i] = NewProblem(level, isHit)
 	}
+	// Shuffle problems
 	for i := range pl {
 		j := rand.Intn(i + 1)
 		pl[i], pl[j] = pl[j], pl[i]

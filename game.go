@@ -17,6 +17,7 @@ type Game struct {
 
 func NewGame() *Game {
 	game := &Game{
+		level:  startLevel,
 		game:   tl.NewGame(),
 		board:  NewBoard(),
 		player: NewPlayer(),
@@ -47,6 +48,7 @@ func (g *Game) buildLevel(gameLevel int) {
 	g.board.populateBoard(gameLevel, answersPerLevel, level)
 	level.AddEntity(g.player)
 	g.game.Screen().SetLevel(level)
+	g.updateStatus()
 }
 
 func (g *Game) addChrome() {

@@ -52,7 +52,7 @@ func (sq *Square) Draw(screen *tl.Screen) {
 }
 
 func (sq *Square) Hit() bool {
-	if sq.problem.valid {
+	if sq.problem.valid && sq.visible {
 		sq.visible = false
 		return true
 	}
