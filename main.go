@@ -2,6 +2,7 @@ package main
 
 import (
 	tl "github.com/JoelOtter/termloop"
+	"strconv"
 )
 
 type Board struct {
@@ -10,7 +11,6 @@ type Board struct {
 }
 
 func (board *Board) Draw(screen *tl.Screen) {
-
 	board.entity.Draw(screen)
 }
 
@@ -25,7 +25,14 @@ func NewBoard(level int) *Board {
 	return board
 }
 
-func drawBackground(level tl.Level) {
+func buildLevel(game *tl.Game, score int) {
+	level := tl.NewBaseLevel(tl.Cell{})
+	game.Screen().SetLevel(level)
+	scoretext := tl.NewText(50, 0, "Score: "+strconv.Itoa(score),
+		tl.ColorWhite, tl.ColorBlack)
+	game.Screen().AddEntity(tl.NewText(1, 0, "Number crusader!", tl.ColorRed, tl.ColorBlack))
+	game.Screen().AddEntity(scoretext)
+
 	level.AddEntity(tl.NewRectangle(1, 1, 65, 33, tl.ColorGreen))
 	for i := 2; i < 63; i = i + 8 {
 		for j := 2; j < 31; j = j + 4 {
@@ -37,14 +44,6 @@ func drawBackground(level tl.Level) {
 func main() {
 	game := tl.NewGame()
 	game.SetDebugOn(true)
-	level := tl.NewBaseLevel(tl.Cell{
-		Bg: tl.ColorBlue,
-		Fg: tl.ColorBlack,
-		Ch: ' ',
-	})
-	board := NewBoard(1)
-	drawBackground(level)
-	level.AddEntity(board)
-	game.Screen().SetLevel(level)
+	buildLevel(game, 0)
 	game.Start()
 }
