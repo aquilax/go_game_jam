@@ -15,10 +15,14 @@ const (
 	cellWidth   = 7
 	borderWidth = 1
 	offsetX     = 1
+	cellOffsetX = 1
 
 	cellHeight   = 3
 	borderHeight = 1
 	offsetY      = 1
+	cellOffsetY  = 1
+
+	playerChar = '옷'
 )
 
 // BoardCell contains number pair for solving
@@ -31,7 +35,6 @@ type BoardCell struct {
 type BoardCellList []BoardCell
 
 // Board contains all number pairs for the level
-type Board [][]BoardCell
 
 type Player struct {
 	game   *tl.Game
@@ -40,9 +43,55 @@ type Player struct {
 	entity *tl.Entity
 }
 
+type RenderCell struct {
+	boardX  int
+	boardY  int
+	bc      BoardCell
+	visible bool
+	canvas  []tl.Cell
+	entity  *tl.Entity
+}
+
+type Board [][]RenderCell
+
 // String returns textual representation of the number pair
 func (bc *BoardCell) String() string {
 	return fmt.Sprintf("%2d+%-2d", bc.n1, bc.n2)
+}
+
+func NewRenderCell(boardX, boardY int, bc BoardCell) RenderCell {
+	str := []rune(bc.String())
+	c := make([]tl.Cell, len(str))
+	for i := range c {
+		c[i] = tl.Cell{Ch: str[i]}
+	}
+	rc := RenderCell{
+		boardX,
+		boardY,
+		bc,
+		true,
+		c,
+		tl.NewEntity(1, 1, cellWidth, cellHeight),
+	}
+	rc.entity.SetPosition(rc.getPosition())
+	return rc
+}
+
+func (rc *RenderCell) getPosition() (int, int) {
+	x := offsetX + borderWidth + (rc.boardX * cellWidth) + rc.boardX*cellOffsetX + 1
+	y := offsetY + borderHeight + (rc.boardY * cellHeight) + rc.boardY*cellOffsetY + 1
+	return x, y
+}
+
+func (rc *RenderCell) Tick(event tl.Event) {}
+
+func (rc *RenderCell) Draw(screen *tl.Screen) {
+	if rc.visible {
+		x, y := rc.getPosition()
+		for i := 0; i < 5; i++ {
+			screen.RenderCell(x+i, y, &rc.canvas[i])
+		}
+	}
 }
 
 func NewPlayer(game *tl.Game) Player {
@@ -52,7 +101,7 @@ func NewPlayer(game *tl.Game) Player {
 		0,
 		tl.NewEntity(1, 1, 1, 1),
 	}
-	player.entity.SetCell(0, 0, &tl.Cell{Bg: tl.ColorRed, Ch: '옷'})
+	player.entity.SetCell(0, 0, &tl.Cell{Bg: tl.ColorRed, Ch: playerChar})
 	player.entity.SetPosition(player.getPosition())
 	return player
 }
@@ -127,12 +176,8 @@ func NewBoardCellList(level, valid, size int) BoardCellList {
 // NewBoard generates new level board
 func NewBoard(level int) Board {
 	board := make(Board, boardWidth)
-	bcl := NewBoardCellList(level, answersPerLevel, boardWidth*boardHeight)
 	for i := range board {
-		board[i] = make([]BoardCell, boardHeight)
-		for j := range board {
-			board[i][j] = bcl[i+j]
-		}
+		board[i] = make([]RenderCell, boardHeight)
 	}
 	return board
 }
@@ -141,10 +186,13 @@ func buildLevel(game *tl.Game, gameLevel, score int) {
 	level := tl.NewBaseLevel(tl.Cell{})
 	game.Screen().SetLevel(level)
 	// Add chrome
-	scoretext := tl.NewText(50, 0, "Score: "+strconv.Itoa(score),
+	levelText := tl.NewText(30, 0, "Level: "+strconv.Itoa(gameLevel),
+		tl.ColorWhite, tl.ColorBlack)
+	scoreText := tl.NewText(50, 0, "Score: "+strconv.Itoa(score),
 		tl.ColorWhite, tl.ColorBlack)
 	game.Screen().AddEntity(tl.NewText(1, 0, " Number crusader! ", tl.ColorBlack, tl.ColorGreen))
-	game.Screen().AddEntity(scoretext)
+	game.Screen().AddEntity(scoreText)
+	game.Screen().AddEntity(levelText)
 
 	// Create the level background
 	level.AddEntity(tl.NewRectangle(1, 1, 65, 33, tl.ColorGreen))
@@ -155,11 +203,12 @@ func buildLevel(game *tl.Game, gameLevel, score int) {
 	}
 	// Add the numbers
 	board := NewBoard(gameLevel)
-	for i := range board {
-		for j := range board[i] {
-			x := i*8 + 3
-			y := j*4 + 3
-			game.Screen().AddEntity(tl.NewText(x, y, board[i][j].String(), tl.ColorWhite, tl.ColorBlue))
+	bcl := NewBoardCellList(gameLevel, answersPerLevel, boardWidth*boardHeight)
+	for x := 0; x < boardWidth; x++ {
+		for y := 0; y < boardHeight; y++ {
+			rc := NewRenderCell(x, y, bcl[x+y])
+			board[x][y] = rc
+			game.Screen().AddEntity(&rc)
 		}
 	}
 	player := NewPlayer(game)
