@@ -27,8 +27,9 @@ const (
 
 // BoardCell contains number pair for solving
 type BoardCell struct {
-	n1 int
-	n2 int
+	n1    int
+	n2    int
+	valid bool
 }
 
 // BoardCellList contains list of number pairs
@@ -95,6 +96,12 @@ func (rc *RenderCell) Draw(screen *tl.Screen) {
 	}
 }
 
+func (rc *RenderCell) Hit() {
+	if rc.bc.valid {
+		rc.visible = false
+	}
+}
+
 func NewPlayer(game *tl.Game, board *Board) Player {
 	player := Player{
 		game,
@@ -142,7 +149,7 @@ func (player *Player) Tick(event tl.Event) {
 			}
 			break
 		case tl.KeySpace:
-			(*player.board)[player.boardX][player.boardY].visible = false
+			(*player.board)[player.boardX][player.boardY].Hit()
 			break
 		}
 
@@ -152,14 +159,14 @@ func (player *Player) Tick(event tl.Event) {
 }
 
 // NewBoardCell generates new pair of numbers for the board
-func NewBoardCell(level int, isHit bool) BoardCell {
+func NewBoardCell(level int, isValid bool) BoardCell {
 	sum := level + 1
 	n1 := rand.Intn(sum)
 	n2 := sum - n1
-	if !isHit {
+	if !isValid {
 		n2++
 	}
-	return BoardCell{n1, n2}
+	return BoardCell{n1, n2, isValid}
 }
 
 // NewBoardCellList generates all number pairs for a level
