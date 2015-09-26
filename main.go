@@ -27,11 +27,12 @@ const (
 )
 
 func buildLevel(game *tl.Game, gameLevel, score int) {
-	level := tl.NewBaseLevel(tl.Cell{})
-	game.Screen().SetLevel(level)
+	screen := game.Screen()
 	// Add title
-	game.Screen().AddEntity(tl.NewText(1, 0, " Number crusader! ", tl.ColorBlack, tl.ColorGreen))
+	screen.AddEntity(tl.NewText(1, 0, " Number crusader! ", tl.ColorBlack, tl.ColorGreen))
 
+	// Add the numbers
+	level := tl.NewBaseLevel(tl.Cell{})
 	// TODO: Remove this abomination
 	level.AddEntity(tl.NewRectangle(1, 1, 65, 33, tl.ColorGreen))
 	for i := 2; i < 63; i = i + 8 {
@@ -39,19 +40,19 @@ func buildLevel(game *tl.Game, gameLevel, score int) {
 			level.AddEntity(tl.NewRectangle(i, j, 7, 3, tl.ColorBlue))
 		}
 	}
-	// Add the numbers
 	board := NewBoard(gameLevel)
 	bcl := NewProblemList(gameLevel, answersPerLevel, boardWidth*boardHeight)
 	for y := 0; y < boardWidth; y++ {
 		for x := 0; x < boardHeight; x++ {
 			rc := NewSquare(x, y, bcl[x*boardWidth+y])
 			(*board)[x][y] = rc
-			game.Screen().AddEntity(rc)
+			level.AddEntity(rc)
 		}
 	}
 	player := NewPlayer(game, board)
-	level.AddEntity(&player)
+	level.AddEntity(player)
 	level.AddEntity(player.status)
+	screen.SetLevel(level)
 }
 
 func main() {

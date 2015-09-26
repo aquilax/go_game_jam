@@ -17,22 +17,22 @@ type Player struct {
 	status *tl.Text
 }
 
-func NewPlayer(game *tl.Game, board *Board) Player {
+func NewPlayer(game *tl.Game, board *Board) *Player {
 	player := Player{
-		startLevel,
-		playerLives,
-		0,
-		game,
-		0,
-		0,
-		board,
-		tl.NewEntity(1, 1, 1, 1),
-		tl.NewText(20, 0, "", tl.ColorWhite, tl.ColorBlack),
+		level:  startLevel,
+		lives:  playerLives,
+		score:  0,
+		game:   game,
+		boardX: 0,
+		boardY: 0,
+		board:  board,
+		entity: tl.NewEntity(1, 1, 1, 1),
+		status: tl.NewText(20, 0, "", tl.ColorWhite, tl.ColorBlack),
 	}
 	player.updateStatus()
 	player.entity.SetCell(0, 0, &tl.Cell{Bg: tl.ColorRed, Ch: playerChar})
 	player.entity.SetPosition(player.getPosition())
-	return player
+	return &player
 }
 
 func (player *Player) Draw(screen *tl.Screen) {
