@@ -60,7 +60,7 @@ func (sq *Square) Hit() bool {
 }
 
 // NewBoard generates new level board
-func NewBoard(level int) *Board {
+func NewBoard() *Board {
 	board := make(Board, boardWidth)
 	for i := range board {
 		board[i] = make([]*Square, boardHeight)
@@ -78,4 +78,15 @@ func (b *Board) isLevelComplete() bool {
 		}
 	}
 	return true
+}
+
+func (b *Board) populateBoard(gameLevel, answersPerLevel int, level tl.Level) {
+	pl := NewProblemList(gameLevel, answersPerLevel, boardWidth*boardHeight)
+	for y := 0; y < boardWidth; y++ {
+		for x := 0; x < boardHeight; x++ {
+			rc := NewSquare(x, y, pl[x*boardWidth+y])
+			(*b)[x][y] = rc
+			level.AddEntity(rc)
+		}
+	}
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	tl "github.com/JoelOtter/termloop"
 )
 
@@ -9,27 +8,20 @@ type Player struct {
 	level  int
 	lives  int
 	score  int
-	game   *tl.Game
 	boardX int
 	boardY int
-	board  *Board
 	entity *tl.Entity
-	status *tl.Text
+	game   *Game
 }
 
-func NewPlayer(game *tl.Game, board *Board) *Player {
+func NewPlayer() *Player {
 	player := Player{
-		level:  startLevel,
 		lives:  playerLives,
 		score:  0,
-		game:   game,
 		boardX: 0,
 		boardY: 0,
-		board:  board,
 		entity: tl.NewEntity(1, 1, 1, 1),
-		status: tl.NewText(20, 0, "", tl.ColorWhite, tl.ColorBlack),
 	}
-	player.updateStatus()
 	player.entity.SetCell(0, 0, &tl.Cell{Bg: tl.ColorRed, Ch: playerChar})
 	player.entity.SetPosition(player.getPosition())
 	return &player
@@ -63,29 +55,27 @@ func (player *Player) Tick(event tl.Event) {
 			}
 			break
 		case tl.KeySpace:
-			if (*player.board)[player.boardX][player.boardY].Hit() {
+			if (*player.game.board)[player.boardX][player.boardY].Hit() {
 				player.score++
 			} else {
 				player.lives--
 			}
-			player.updateStatus()
-			if player.board.isLevelComplete() {
-				// TODO: New Level
+			player.game.updateStatus()
+			if player.game.board.isLevelComplete() {
+				player.game.nextLevel()
 			}
 			break
 		}
-		player.game.Log("BoardX=%d\tBoardY=%d", player.boardX, player.boardY)
 		player.entity.SetPosition(player.getPosition())
 	}
-}
-
-func (player *Player) updateStatus() {
-	statusText := fmt.Sprintf("Lvl %2d | ❤ %d | Score %06d", player.level, player.lives, player.score)
-	player.status.SetText(statusText)
 }
 
 func (player *Player) getPosition() (int, int) {
 	x := player.boardX*(squareWidth+borderWidth) + offsetX + borderWidth
 	y := player.boardY*(squareHeight+borderHeight) + offsetY + borderHeight
 	return x, y
+}
+
+func (player *Player) setGame(game *Game) {
+	player.game = game
 }
