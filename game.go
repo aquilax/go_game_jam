@@ -40,9 +40,9 @@ func (g *Game) buildLevel(gameLevel int) {
 	level := tl.NewBaseLevel(tl.Cell{})
 	// TODO: Remove this abomination
 	level.AddEntity(tl.NewRectangle(1, 1, 65, 33, tl.ColorGreen))
-	for i := 2; i < 63; i = i + 8 {
-		for j := 2; j < 31; j = j + 4 {
-			level.AddEntity(tl.NewRectangle(i, j, 7, 3, tl.ColorBlue))
+	for y := 2; y < 63; y = y + 8 {
+		for x := 2; x < 31; x = x + 4 {
+			level.AddEntity(tl.NewRectangle(y, x, 7, 3, tl.ColorBlue))
 		}
 	}
 	g.board.populateBoard(gameLevel, answersPerLevel, level)
@@ -73,5 +73,5 @@ func (g *Game) restartGame() {
 }
 
 func (g *Game) gameOver() {
-	g.game.Screen().Level().AddEntity(tl.NewText(30, 20, " GAME OVER ", tl.ColorBlack, tl.ColorRed))
+	g.game.Screen().Level().AddEntity(tl.NewText(28, 17, " GAME OVER ", tl.ColorBlack, tl.ColorRed))
 }

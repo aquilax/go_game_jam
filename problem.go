@@ -26,7 +26,7 @@ func NewProblem(level int, isValid bool) *Problem {
 	n1 := rand.Intn(sum)
 	n2 := sum - n1
 	if !isValid {
-		n2++
+		n2 += 1 + rand.Intn(3)
 	}
 	r := rand.Intn(10)
 	if r > 4 {
