@@ -4,26 +4,29 @@ import (
 	tl "github.com/JoelOtter/termloop"
 )
 
+type PlayerState int
+
+const (
+	stateAlive PlayerState = iota
+	stateDead
+)
+
 type Player struct {
-	level  int
 	lives  int
 	score  int
 	boardX int
 	boardY int
 	entity *tl.Entity
 	game   *Game
+	state  PlayerState
 }
 
 func NewPlayer() *Player {
 	player := Player{
-		lives:  playerLives,
-		score:  0,
-		boardX: 0,
-		boardY: 0,
 		entity: tl.NewEntity(1, 1, 1, 1),
 	}
+	player.Init()
 	player.entity.SetCell(0, 0, &tl.Cell{Bg: tl.ColorRed, Ch: playerChar})
-	player.entity.SetPosition(player.getPosition())
 	return &player
 }
 
@@ -32,8 +35,12 @@ func (player *Player) Draw(screen *tl.Screen) {
 }
 
 func (player *Player) Tick(event tl.Event) {
-	if event.Type == tl.EventKey { // Is it a keyboard event?
-		switch event.Key { // If so, switch on the pressed key.
+	if event.Type == tl.EventKey {
+		if player.state == stateDead {
+			player.game.restartGame()
+			return
+		}
+		switch event.Key {
 		case tl.KeyArrowRight:
 			if player.boardX < boardWidth-1 {
 				player.boardX += 1
@@ -61,6 +68,10 @@ func (player *Player) Tick(event tl.Event) {
 				player.lives--
 			}
 			player.game.updateStatus()
+			if player.lives < 1 {
+				player.state = stateDead
+				player.game.gameOver()
+			}
 			if player.game.board.isLevelComplete() {
 				player.game.nextLevel()
 			}
@@ -68,6 +79,15 @@ func (player *Player) Tick(event tl.Event) {
 		}
 		player.entity.SetPosition(player.getPosition())
 	}
+}
+
+func (player *Player) Init() {
+	player.lives = playerLives
+	player.score = 0
+	player.boardX = 0
+	player.boardY = 0
+	player.state = stateAlive
+	player.entity.SetPosition(player.getPosition())
 }
 
 func (player *Player) getPosition() (int, int) {

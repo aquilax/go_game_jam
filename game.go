@@ -65,3 +65,13 @@ func (g *Game) nextLevel() {
 	g.level++
 	g.buildLevel(g.level)
 }
+
+func (g *Game) restartGame() {
+	g.level = 1
+	g.player.Init()
+	g.buildLevel(g.level)
+}
+
+func (g *Game) gameOver() {
+	g.game.Screen().Level().AddEntity(tl.NewText(30, 20, " GAME OVER ", tl.ColorBlack, tl.ColorRed))
+}
