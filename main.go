@@ -40,6 +40,7 @@ type Player struct {
 	game   *tl.Game
 	boardX int
 	boardY int
+	board  *Board
 	entity *tl.Entity
 }
 
@@ -52,14 +53,14 @@ type RenderCell struct {
 	entity  *tl.Entity
 }
 
-type Board [][]RenderCell
+type Board [][]*RenderCell
 
 // String returns textual representation of the number pair
 func (bc *BoardCell) String() string {
 	return fmt.Sprintf("%2d+%-2d", bc.n1, bc.n2)
 }
 
-func NewRenderCell(boardX, boardY int, bc BoardCell) RenderCell {
+func NewRenderCell(boardX, boardY int, bc BoardCell) *RenderCell {
 	str := []rune(bc.String())
 	c := make([]tl.Cell, len(str))
 	for i := range c {
@@ -74,7 +75,7 @@ func NewRenderCell(boardX, boardY int, bc BoardCell) RenderCell {
 		tl.NewEntity(1, 1, cellWidth, cellHeight),
 	}
 	rc.entity.SetPosition(rc.getPosition())
-	return rc
+	return &rc
 }
 
 func (rc *RenderCell) getPosition() (int, int) {
@@ -94,11 +95,12 @@ func (rc *RenderCell) Draw(screen *tl.Screen) {
 	}
 }
 
-func NewPlayer(game *tl.Game) Player {
+func NewPlayer(game *tl.Game, board *Board) Player {
 	player := Player{
 		game,
 		0,
 		0,
+		board,
 		tl.NewEntity(1, 1, 1, 1),
 	}
 	player.entity.SetCell(0, 0, &tl.Cell{Bg: tl.ColorRed, Ch: playerChar})
@@ -139,7 +141,11 @@ func (player *Player) Tick(event tl.Event) {
 				player.boardY += 1
 			}
 			break
+		case tl.KeySpace:
+			(*player.board)[player.boardX][player.boardY].visible = false
+			break
 		}
+
 		player.game.Log("BoardX=%d\tBoardY=%d", player.boardX, player.boardY)
 		player.entity.SetPosition(player.getPosition())
 	}
@@ -177,7 +183,7 @@ func NewBoardCellList(level, valid, size int) BoardCellList {
 func NewBoard(level int) Board {
 	board := make(Board, boardWidth)
 	for i := range board {
-		board[i] = make([]RenderCell, boardHeight)
+		board[i] = make([]*RenderCell, boardHeight)
 	}
 	return board
 }
@@ -208,10 +214,10 @@ func buildLevel(game *tl.Game, gameLevel, score int) {
 		for y := 0; y < boardHeight; y++ {
 			rc := NewRenderCell(x, y, bcl[x+y])
 			board[x][y] = rc
-			game.Screen().AddEntity(&rc)
+			game.Screen().AddEntity(rc)
 		}
 	}
-	player := NewPlayer(game)
+	player := NewPlayer(game, &board)
 	level.AddEntity(&player)
 
 }
