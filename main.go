@@ -4,13 +4,15 @@ import (
 	"fmt"
 	tl "github.com/JoelOtter/termloop"
 	"math/rand"
-	"strconv"
+	"time"
 )
 
 const (
 	boardWidth      = 8
 	boardHeight     = 8
 	answersPerLevel = 10
+	playerLives     = 3
+	startLevel      = 1
 
 	cellWidth   = 7
 	borderWidth = 1
@@ -38,11 +40,15 @@ type BoardCellList []BoardCell
 // Board contains all number pairs for the level
 
 type Player struct {
+	level  int
+	lives  int
+	score  int
 	game   *tl.Game
 	boardX int
 	boardY int
 	board  *Board
 	entity *tl.Entity
+	status *tl.Text
 }
 
 type RenderCell struct {
@@ -96,20 +102,27 @@ func (rc *RenderCell) Draw(screen *tl.Screen) {
 	}
 }
 
-func (rc *RenderCell) Hit() {
+func (rc *RenderCell) Hit() bool {
 	if rc.bc.valid {
 		rc.visible = false
+		return true
 	}
+	return false
 }
 
 func NewPlayer(game *tl.Game, board *Board) Player {
 	player := Player{
+		startLevel,
+		playerLives,
+		0,
 		game,
 		0,
 		0,
 		board,
 		tl.NewEntity(1, 1, 1, 1),
+		tl.NewText(20, 0, "", tl.ColorWhite, tl.ColorBlack),
 	}
+	player.updateStatus()
 	player.entity.SetCell(0, 0, &tl.Cell{Bg: tl.ColorRed, Ch: playerChar})
 	player.entity.SetPosition(player.getPosition())
 	return player
@@ -117,6 +130,11 @@ func NewPlayer(game *tl.Game, board *Board) Player {
 
 func (player *Player) Draw(screen *tl.Screen) {
 	player.entity.Draw(screen)
+}
+
+func (player *Player) updateStatus() {
+	statusText := fmt.Sprintf("Lvl %2d | ❤ %d | Score %06d", player.level, player.lives, player.score)
+	player.status.SetText(statusText)
 }
 
 func (player *Player) getPosition() (int, int) {
@@ -149,7 +167,12 @@ func (player *Player) Tick(event tl.Event) {
 			}
 			break
 		case tl.KeySpace:
-			(*player.board)[player.boardX][player.boardY].Hit()
+			if (*player.board)[player.boardX][player.boardY].Hit() {
+				player.score++
+			} else {
+				player.lives--
+			}
+			player.updateStatus()
 			break
 		}
 
@@ -160,7 +183,7 @@ func (player *Player) Tick(event tl.Event) {
 
 // NewBoardCell generates new pair of numbers for the board
 func NewBoardCell(level int, isValid bool) BoardCell {
-	sum := level + 1
+	sum := level
 	n1 := rand.Intn(sum)
 	n2 := sum - n1
 	if !isValid {
@@ -198,14 +221,8 @@ func NewBoard(level int) Board {
 func buildLevel(game *tl.Game, gameLevel, score int) {
 	level := tl.NewBaseLevel(tl.Cell{})
 	game.Screen().SetLevel(level)
-	// Add chrome
-	levelText := tl.NewText(30, 0, "Level: "+strconv.Itoa(gameLevel),
-		tl.ColorWhite, tl.ColorBlack)
-	scoreText := tl.NewText(50, 0, "Score: "+strconv.Itoa(score),
-		tl.ColorWhite, tl.ColorBlack)
+	// Add title
 	game.Screen().AddEntity(tl.NewText(1, 0, " Number crusader! ", tl.ColorBlack, tl.ColorGreen))
-	game.Screen().AddEntity(scoreText)
-	game.Screen().AddEntity(levelText)
 
 	// Create the level background
 	level.AddEntity(tl.NewRectangle(1, 1, 65, 33, tl.ColorGreen))
@@ -226,12 +243,13 @@ func buildLevel(game *tl.Game, gameLevel, score int) {
 	}
 	player := NewPlayer(game, &board)
 	level.AddEntity(&player)
-
+	level.AddEntity(player.status)
 }
 
 func main() {
 	game := tl.NewGame()
 	game.SetDebugOn(true)
+	rand.Seed(time.Now().UTC().UnixNano())
 	buildLevel(game, 1, 0)
 	game.Start()
 }
