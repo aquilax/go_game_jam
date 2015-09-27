@@ -7,6 +7,21 @@ The rules are simple for each level, You must find all equations, which result t
 
 Each successfully completed level, gives you one live, and score bonus, equal to the lives you had when finishing the level. Each level has 10 correct solutions, which you need to find.
 
+### Installation
+
+To install the game you'll need to have [go](https://golang.org/) installed. 
+
+```bash
+$ go get github.com/aquilax/number_crusher
+```
+
+To run the game:
+```bash
+$ $GOPATH/bin/number_crusher
+```
+
+The game uses the [termloop](https://github.com/JoelOtter/termloop) library, which is based on [Termbox](https://github.com/nsf/termbox-go) to control the terminal. 
+
 ### Control
 ```
 ▲ - move up
