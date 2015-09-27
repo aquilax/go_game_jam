@@ -23,7 +23,7 @@ func (pr *Problem) String() string {
 // NewProblem generates new pair of numbers for the board
 func NewProblem(level int, isValid bool) *Problem {
 	sum := level
-	n1 := rand.Intn(sum)
+	n1 := rand.Intn(sum + 1)
 	n2 := sum - n1
 	if !isValid {
 		n2 += 1 + rand.Intn(3)

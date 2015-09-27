@@ -43,9 +43,9 @@ func (foe *Foe) Tick(event tl.Event) {
 }
 
 func (foe *Foe) newPosition(playerX, playerY, x, y int) (int, int) {
-	move := rand.Intn(2) - 1
+	move := rand.Intn(3) - 1
 	if move != 0 {
-		if rand.Intn(100) > 50 {
+		if rand.Intn(2) > 0 {
 			newX := x + move
 			if newX >= 0 && newX < boardWidth {
 				return newX, y
@@ -70,8 +70,8 @@ func (foe *Foe) getPosition() (int, int) {
 }
 
 func (foe *Foe) Init() {
-	foe.boardX = boardHeight - 1
-	foe.boardY = boardWidth - 1
+	foe.boardX = boardWidth - 1
+	foe.boardY = boardHeight - 1
 	foe.frame = 0
 	foe.entity.SetPosition(foe.getPosition())
 }

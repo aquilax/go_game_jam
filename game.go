@@ -21,7 +21,7 @@ func NewGame() *Game {
 		level:  startLevel,
 		game:   tl.NewGame(),
 		board:  NewBoard(),
-		status: tl.NewText(20, 0, "", tl.ColorWhite, tl.ColorBlack),
+		status: tl.NewText(19, 0, "", tl.ColorWhite, tl.ColorBlack),
 	}
 	game.player = NewPlayer(game)
 	game.updateStatus()
@@ -64,7 +64,7 @@ func (g *Game) buildLevel(gameLevel int) {
 }
 
 func (g *Game) addChrome() {
-	g.game.Screen().AddEntity(tl.NewText(1, 0, " Number crusader! ", tl.ColorBlack, tl.ColorGreen))
+	g.game.Screen().AddEntity(tl.NewText(1, 0, " Number crusher! ", tl.ColorBlack, tl.ColorGreen))
 	g.game.Screen().AddEntity(g.status)
 }
 

@@ -63,7 +63,7 @@ func (player *Player) Tick(event tl.Event) {
 			}
 			break
 		case tl.KeySpace:
-			if (*player.game.board)[player.boardX][player.boardY].Hit() {
+			if (*player.game.board)[player.boardY][player.boardX].Hit() {
 				player.score++
 			} else {
 				player.game.Kill()
