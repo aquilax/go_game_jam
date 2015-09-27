@@ -47,6 +47,8 @@ func (g *Game) buildLevel(gameLevel int) {
 	}
 	g.board.populateBoard(gameLevel, answersPerLevel, level)
 	level.AddEntity(g.player)
+	foe := NewFoe(g)
+	level.AddEntity(foe)
 	g.game.Screen().SetLevel(level)
 	g.updateStatus()
 }

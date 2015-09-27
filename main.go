@@ -18,6 +18,7 @@ const (
 	squareOffsetY = 1
 
 	playerChar = '옷'
+	foeChar    = '@'
 )
 
 func main() {

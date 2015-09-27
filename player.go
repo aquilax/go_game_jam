@@ -73,6 +73,9 @@ func (player *Player) Tick(event tl.Event) {
 				player.game.gameOver()
 			}
 			if player.game.board.isLevelComplete() {
+				player.boardX = 0
+				player.boardY = 0
+				player.entity.SetPosition(player.getPosition())
 				player.game.nextLevel()
 			}
 			break
