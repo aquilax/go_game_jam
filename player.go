@@ -21,8 +21,9 @@ type Player struct {
 	state  PlayerState
 }
 
-func NewPlayer() *Player {
+func NewPlayer(game *Game) *Player {
 	player := Player{
+		game:   game,
 		entity: tl.NewEntity(1, 1, 1, 1),
 	}
 	player.Init()
@@ -65,13 +66,9 @@ func (player *Player) Tick(event tl.Event) {
 			if (*player.game.board)[player.boardX][player.boardY].Hit() {
 				player.score++
 			} else {
-				player.lives--
+				player.game.Kill()
 			}
 			player.game.updateStatus()
-			if player.lives < 1 {
-				player.state = stateDead
-				player.game.gameOver()
-			}
 			if player.game.board.isLevelComplete() {
 				player.boardX = 0
 				player.boardY = 0
@@ -79,6 +76,9 @@ func (player *Player) Tick(event tl.Event) {
 				player.game.nextLevel()
 			}
 			break
+		}
+		if player.game.isCaptured() {
+			player.game.Kill()
 		}
 		player.entity.SetPosition(player.getPosition())
 	}
@@ -97,8 +97,4 @@ func (player *Player) getPosition() (int, int) {
 	x := player.boardX*(squareWidth+borderWidth) + offsetX + borderWidth
 	y := player.boardY*(squareHeight+borderHeight) + offsetY + borderHeight
 	return x, y
-}
-
-func (player *Player) setGame(game *Game) {
-	player.game = game
 }

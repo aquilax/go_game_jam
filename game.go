@@ -12,6 +12,7 @@ type Game struct {
 	game   *tl.Game
 	board  *Board
 	player *Player
+	foes   []*Foe
 	status *tl.Text
 }
 
@@ -20,11 +21,9 @@ func NewGame() *Game {
 		level:  startLevel,
 		game:   tl.NewGame(),
 		board:  NewBoard(),
-		player: NewPlayer(),
 		status: tl.NewText(20, 0, "", tl.ColorWhite, tl.ColorBlack),
 	}
-	// TODO: This is ugly
-	game.player.setGame(game)
+	game.player = NewPlayer(game)
 	game.updateStatus()
 	return game
 }
@@ -47,8 +46,15 @@ func (g *Game) buildLevel(gameLevel int) {
 	}
 	g.board.populateBoard(gameLevel, answersPerLevel, level)
 	level.AddEntity(g.player)
-	foe := NewFoe(g)
-	level.AddEntity(foe)
+	// Add Foes
+	foes := 2
+	g.foes = g.foes[:0]
+	var foe *Foe
+	for i := 0; i < foes; i++ {
+		foe = NewFoe(g)
+		g.foes = append(g.foes, foe)
+		level.AddEntity(foe)
+	}
 	g.game.Screen().SetLevel(level)
 	g.updateStatus()
 }
@@ -76,4 +82,27 @@ func (g *Game) restartGame() {
 
 func (g *Game) gameOver() {
 	g.game.Screen().Level().AddEntity(tl.NewText(28, 17, " GAME OVER ", tl.ColorBlack, tl.ColorRed))
+}
+
+func (g *Game) isCaptured() bool {
+	px := g.player.boardX
+	py := g.player.boardY
+	for i := range g.foes {
+		if px == g.foes[i].boardX && py == g.foes[i].boardY {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *Game) Kill() {
+	g.player.lives--
+	g.updateStatus()
+	g.player.boardX = 0
+	g.player.boardY = 0
+	for i := range g.foes {
+		g.foes[i].boardX = boardWidth - 1
+		g.foes[i].boardY = boardHeight - 1
+		g.foes[i].entity.SetPosition(g.foes[i].getPosition())
+	}
 }

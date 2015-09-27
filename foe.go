@@ -25,10 +25,13 @@ func NewFoe(game *Game) *Foe {
 }
 
 func (foe *Foe) Draw(screen *tl.Screen) {
-	foe.speed = int(foe.game.game.Screen().TimeDelta() * float64(100000/foe.game.level))
+	foe.speed = int(foe.game.game.Screen().TimeDelta() * float64(400000/foe.game.level))
 	if foe.frame > foe.speed {
 		foe.boardX, foe.boardY = foe.newPosition(foe.game.player.boardX, foe.game.player.boardY, foe.boardX, foe.boardY)
 		foe.entity.SetPosition(foe.getPosition())
+		if foe.game.isCaptured() {
+			foe.game.Kill()
+		}
 		foe.frame = 0
 	}
 	foe.frame++
@@ -42,7 +45,7 @@ func (foe *Foe) Tick(event tl.Event) {
 func (foe *Foe) newPosition(playerX, playerY, x, y int) (int, int) {
 	move := rand.Intn(2) - 1
 	if move != 0 {
-		if rand.Intn(10) > 4 {
+		if rand.Intn(100) > 50 {
 			newX := x + move
 			if newX >= 0 && newX < boardWidth {
 				return newX, y
