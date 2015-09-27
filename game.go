@@ -38,16 +38,20 @@ func (g *Game) Run() {
 func (g *Game) buildLevel(gameLevel int) {
 	level := tl.NewBaseLevel(tl.Cell{})
 	// TODO: Remove this abomination
-	level.AddEntity(tl.NewRectangle(1, 1, 65, 33, tl.ColorGreen))
-	for y := 2; y < 63; y = y + 8 {
-		for x := 2; x < 31; x = x + 4 {
-			level.AddEntity(tl.NewRectangle(y, x, 7, 3, tl.ColorBlue))
+	width := boardWidth*squareWidth + (boardWidth+1)*borderWidth
+	height := boardHeight*squareHeight + (boardHeight+1)*borderHeight
+	level.AddEntity(tl.NewRectangle(1, 1, width, height, tl.ColorGreen))
+	for i := 0; i < boardHeight; i++ {
+		for j := 0; j < boardWidth; j++ {
+			x := 1 + borderWidth + (j * squareWidth) + j*borderWidth
+			y := 1 + borderHeight + (i * squareHeight) + i*borderHeight
+			level.AddEntity(tl.NewRectangle(x, y, squareWidth, squareHeight, tl.ColorBlue))
 		}
 	}
 	g.board.populateBoard(gameLevel, answersPerLevel, level)
 	level.AddEntity(g.player)
 	// Add Foes
-	foes := 2
+	foes := int(gameLevel/10) + 2
 	g.foes = g.foes[:0]
 	var foe *Foe
 	for i := 0; i < foes; i++ {
