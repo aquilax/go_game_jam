@@ -70,6 +70,8 @@ func (player *Player) Tick(event tl.Event) {
 			}
 			player.game.updateStatus()
 			if player.game.board.isLevelComplete() {
+				player.score += player.lives
+				player.lives++
 				player.boardX = 0
 				player.boardY = 0
 				player.entity.SetPosition(player.getPosition())

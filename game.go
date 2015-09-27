@@ -43,8 +43,8 @@ func (g *Game) buildLevel(gameLevel int) {
 	level.AddEntity(tl.NewRectangle(1, 1, width, height, tl.ColorGreen))
 	for i := 0; i < boardHeight; i++ {
 		for j := 0; j < boardWidth; j++ {
-			x := 1 + borderWidth + (j * squareWidth) + j*borderWidth
-			y := 1 + borderHeight + (i * squareHeight) + i*borderHeight
+			x := offsetX + borderWidth + (j * squareWidth) + j*borderWidth
+			y := offsetY + borderHeight + (i * squareHeight) + i*borderHeight
 			level.AddEntity(tl.NewRectangle(x, y, squareWidth, squareHeight, tl.ColorBlue))
 		}
 	}
@@ -64,8 +64,12 @@ func (g *Game) buildLevel(gameLevel int) {
 }
 
 func (g *Game) addChrome() {
-	g.game.Screen().AddEntity(tl.NewText(1, 0, " Number crusher! ", tl.ColorBlack, tl.ColorGreen))
-	g.game.Screen().AddEntity(g.status)
+	screen := g.game.Screen()
+	screen.AddEntity(tl.NewText(offsetX, 0, " Number crusher! ", tl.ColorBlack, tl.ColorGreen))
+	x := 2*offsetX + (boardWidth * squareWidth) + (boardWidth * borderWidth) + borderWidth
+	rules := tl.NewEntityFromCanvas(x, offsetY, tl.CanvasFromString(rules))
+	screen.AddEntity(rules)
+	screen.AddEntity(g.status)
 }
 
 func (g *Game) updateStatus() {

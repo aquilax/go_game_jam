@@ -19,6 +19,31 @@ const (
 
 	playerChar = '옷'
 	foeChar    = '@'
+
+	rules = `Rules:
+옷 - you
+@ - math police
+
+Every level has math
+problems to solve. Your
+task is to find the
+equations with result
+equal to the level
+number.
+
+Each wrong try costs
+you one live. Each level
+gives you new live, and
+bonus points equal to
+the remaining lives.
+Avoid the math police.
+
+Control:
+▲ - move up
+▼ - move down
+◀ - move left
+▶ -move right
+Space - select solution`
 )
 
 func main() {
