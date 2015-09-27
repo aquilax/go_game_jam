@@ -8,12 +8,13 @@ The rules are simple for each level, You must find all equations, which result t
 Each successfully completed level, gives you one live, and score bonus, equal to the lives you had when finishing the level. Each level has 10 correct solutions, which you need to find.
 
 ### Control
+```
 ▲ - move up
 ▼ - move down
 ◀ - move left
-▶ -move right
+▶ - move right
 Space - select solution
 Esc - exit game
-
+```
 
 [![asciicast](https://asciinema.org/a/5h9v1095b8y7wrggc8xa6to7f.png)](https://asciinema.org/a/5h9v1095b8y7wrggc8xa6to7f)
