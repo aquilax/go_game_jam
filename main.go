@@ -42,8 +42,9 @@ Control:
 ▲ - move up
 ▼ - move down
 ◀ - move left
-▶ -move right
-Space - select solution`
+▶ - move right
+Space - select solution
+Esc - exit game`
 )
 
 func main() {

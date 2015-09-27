@@ -106,6 +106,11 @@ func (g *Game) isCaptured() bool {
 func (g *Game) Kill() {
 	g.player.lives--
 	g.updateStatus()
+	if g.player.lives == 0 {
+		g.player.state = stateDead
+		g.gameOver()
+		return
+	}
 	g.player.boardX = 0
 	g.player.boardY = 0
 	for i := range g.foes {
