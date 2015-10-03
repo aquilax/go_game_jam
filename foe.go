@@ -25,7 +25,7 @@ func NewFoe(game *Game) *Foe {
 }
 
 func (foe *Foe) Draw(screen *tl.Screen) {
-	foe.speed = int(foe.game.game.Screen().TimeDelta() * float64(400000/foe.game.level))
+	foe.speed = int(foe.game.game.Screen().TimeDelta() * float64(30000000/foe.game.level))
 	if foe.frame > foe.speed {
 		foe.boardX, foe.boardY = foe.newPosition(foe.game.player.boardX, foe.game.player.boardY, foe.boardX, foe.boardY)
 		foe.entity.SetPosition(foe.getPosition())
