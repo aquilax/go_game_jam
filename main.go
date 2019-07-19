@@ -44,7 +44,7 @@ Control:
 ◀ - move left
 ▶ - move right
 Space - select solution
-Esc - exit game`
+Ctrl-C - exit game`
 )
 
 func main() {
